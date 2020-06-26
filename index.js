@@ -20,23 +20,30 @@ io.on('connection', (socket) => {
     socket.on('join', ({ name, isInstructor }) => {
         console.log(addUser)
         const user = addUser({ id: socket.id, name, isInstructor })
-        console.log(user)
-        console.log(messages)
+        // console.log(user)
+        // console.log(messages)
         socket.emit('messages', messages)
         socket.emit('helps', helps)
     });
 
     socket.on('sendMessage', (message) => {
         messages = [...messages, message]
-        console.log(messages)
+        // console.log(messages)
         socket.emit('message', message)
         socket.broadcast.emit('message', message)
     })
 
     socket.on('askHelp', (help) => {
-        helps = [...helps, help]
-        socket.emit('help', help)
-        socket.broadcast.emit('help', help)
+        helpIds = helps.map(i => i.id)
+        if (helpIds.includes(help.id)) {
+            helps = [...helps.slice(0, help.id - 1), help, ...helps.slice(help.id)]
+        } else {
+            helps = [...helps, help]
+        }
+        console.log('help', help)
+        console.log('helps', helps)
+        socket.emit('helps', helps)
+        socket.broadcast.emit('helps', helps)
     })
 
     socket.on('disconnect', () => {
