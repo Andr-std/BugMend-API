@@ -6,6 +6,7 @@ const response = 'message';
 
 let messages = [];
 let message = '';
+let helps = [];
 
 const { getUser, addUser, removeUser } = require('./users');
 const users = require('./users');
@@ -22,6 +23,7 @@ io.on('connection', (socket) => {
         console.log(user)
         console.log(messages)
         socket.emit('messages', messages)
+        socket.emit('helps', helps)
     });
 
     socket.on('sendMessage', (message) => {
@@ -29,6 +31,12 @@ io.on('connection', (socket) => {
         console.log(messages)
         socket.emit('message', message)
         socket.broadcast.emit('message', message)
+    })
+
+    socket.on('askHelp', (help) => {
+        helps = [...helps, help]
+        socket.emit('help', help)
+        socket.broadcast.emit('help', help)
     })
 
     socket.on('disconnect', () => {
