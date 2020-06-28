@@ -34,10 +34,13 @@ io.on('connection', (socket) => {
     })
 
     socket.on('askHelp', (help) => {
-        helpIds = helps.map(i => i.id)
-        if (helpIds.includes(help.id)) {
-            helps = [...helps.slice(0, help.id - 1), help, ...helps.slice(help.id)]
-        } else {
+        helpIds = helps.map(i => i.userId)
+        if (helpIds.includes(help.userId) && !help.isSolved) {
+            helps = [...helps.slice(0, helpIds.indexOf(help.userId)), help, ...helps.slice(helpIds.indexOf(help.userId) + 1)]
+        } else if (helpIds.includes(help.userId) && help.isSolved) {
+            helps = [...helps.slice(0, helpIds.indexOf(help.userId)), ...helps.slice(helpIds.indexOf(help.userId) + 1)]
+        }
+        else {
             helps = [...helps, help]
         }
         console.log('help', help)
